@@ -12,6 +12,11 @@
 
 #define isEven(a) (((a) & 1) == 0)
 
+#if PY_MAJOR_VERSION >= 3
+    #define PyString_FromString PyUnicode_FromString
+    #define PyString_FromStringAndSize PyUnicode_FromStringAndSize
+#endif
+
 static PyObject *CPgHstoreError;
 
 /*
@@ -175,7 +180,6 @@ cpghstore_dumps(PyObject *self, PyObject *args)
   return result;
 }
 
-
 static PyMethodDef CPgHstoreMethods[] = {
     {"loads",  cpghstore_loads, METH_VARARGS,
      "Parse (decode) a postgres hstore string into a dict."},
@@ -184,19 +188,53 @@ static PyMethodDef CPgHstoreMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-PyMODINIT_FUNC
-initcpghstore(void)
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef CPgHstoreModule = {
+    PyModuleDef_HEAD_INIT,
+    "cpghstore",         /* m_name */
+    NULL,                /* m_doc */
+    -1,                  /* m_size */
+    CPgHstoreMethods,    /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+};
+#endif
+
+static PyObject *
+cpghstoreinit(void)
 {
     PyObject *m;
 
+#if PY_MAJOR_VERSION >= 3
+    m = PyModule_Create(&CPgHstoreModule);
+#else
     m = Py_InitModule("cpghstore", CPgHstoreMethods);
+#endif
     if (m == NULL)
-        return;
+        return NULL;
 
     CPgHstoreError = PyErr_NewException("cpghstore.CPgHstoreError", NULL, NULL);
     Py_INCREF(CPgHstoreError);
     PyModule_AddObject(m, "cpghstore.CPgHstoreError", CPgHstoreError);
+
+    return m;
 }
+
+#if PY_MAJOR_VERSION < 3
+PyMODINIT_FUNC
+initcpghstore(void)
+{
+    cpghstoreinit();
+}
+#else
+PyMODINIT_FUNC
+PyInit_cpghstore(void)
+{
+    return cpghstoreinit();
+}
+#endif
 
 int
 main(int argc, char *argv[])
@@ -207,8 +245,12 @@ main(int argc, char *argv[])
     /* Initialize the Python interpreter.  Required. */
     Py_Initialize();
 
-    /* Add a static module */
+    /* Init static module */
+#if PY_MAJOR_VERSION < 3
     initcpghstore();
+#else
+    PyInit_cpghstore();
+#endif
 
     return 0;
 }

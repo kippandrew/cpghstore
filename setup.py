@@ -35,5 +35,5 @@ setup(
     platforms=['any'],
     ext_modules=[cpghstore],
     classifiers=CLASSIFIERS,
-    test_suite='tests',
+    test_suite='tests'
 )

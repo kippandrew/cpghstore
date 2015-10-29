@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest
-import pghstore
 import cpghstore
 
 class LoadsTests(unittest.TestCase):
