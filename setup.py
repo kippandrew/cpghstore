@@ -36,4 +36,5 @@ setup(
     ext_modules=[cpghstore],
     classifiers=CLASSIFIERS,
     test_suite='tests',
+    zip_safe=False
 )
