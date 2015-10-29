@@ -25,7 +25,7 @@ except:
 
 setup(
     name='cpghstore',
-    version='0.1',
+    version='0.2',
     description='Fast postgres hstore parser.',
     long_description=LONG_DESCRIPTION,
     author='Robert Kajic',
@@ -35,5 +35,5 @@ setup(
     platforms=['any'],
     ext_modules=[cpghstore],
     classifiers=CLASSIFIERS,
-    test_suite='tests'
+    test_suite='tests',
 )
